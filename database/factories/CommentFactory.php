@@ -17,7 +17,9 @@ class CommentFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'body' => $this->faker->sentence(10),
+            'article_id' => \App\Models\Article::factory(), // Создаст новую статью
+            'user_id' => \App\Models\User::factory(), // Создаст нового юзера
         ];
     }
 }
