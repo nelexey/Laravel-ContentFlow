@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -15,21 +16,36 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = \App\Models\User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        $this->call(RoleSeeder::class);
 
+        $moderatorRole = Role::where('name', 'moderator')->first();
+        $readerRole    = Role::where('name', 'reader')->first();
+
+        $moderatorUser = User::factory()->create([
+            'name'  => 'Moderator',
+            'email' => 'moderator@example.com',
+        ]);
+        $moderatorUser->roles()->attach($moderatorRole);
+
+        $readerUser = User::factory()->create([
+            'name'  => 'Reader',
+            'email' => 'reader@example.com',
+        ]);
+        $readerUser->roles()->attach($readerRole);
 
         $categories = \App\Models\Category::factory(5)->create();
+        $articles   = \App\Models\Article::factory(20)
+                         ->recycle($categories)
+                         ->create();
 
+        \App\Models\Comment::factory(25)
+            ->recycle($articles)
+            ->for($moderatorUser)
+            ->create();
 
-        $articles = \App\Models\Article::factory(20)->recycle($categories)->create();
-
-        // 4.  50 комментов, привязывая их к случайным статьям от Test user
-        \App\Models\Comment::factory(50)
-            ->recycle($articles) // Берет случайные ID из $articles
-            ->for($user)         // Привязывает все комменты к $user
+        \App\Models\Comment::factory(25)
+            ->recycle($articles)
+            ->for($readerUser)
             ->create();
     }
 }
