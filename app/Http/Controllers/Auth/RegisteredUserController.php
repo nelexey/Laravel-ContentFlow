@@ -51,6 +51,6 @@ class RegisteredUserController extends Controller
             $user->roles()->attach($readerRole);
         }
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect()->route('verification.notice');
     }
 }
