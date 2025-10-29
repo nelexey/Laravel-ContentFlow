@@ -14,6 +14,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         Article::class => ArticlePolicy::class,
     ];
+    
     /**
      * Register services.
      */
@@ -27,23 +28,29 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::before(function (User $user, string $ability) {
-            if ($user->hasRole('moderator')) {
-                return true;
-            }
-            return null;
-        });
-
+        // Article policy is automatically registered above
+        
+        // Comment gates
         Gate::define('create-comment', function (User $user) {
-            return $user->hasRole('reader') || $user->hasRole('moderator');
+            // Any authenticated user can create comments
+            return true;
         });
 
         Gate::define('update-comment', function (User $user, Comment $comment) {
+            // Only the comment author can update their comment
             return $user->id === $comment->user_id;
         });
 
         Gate::define('delete-comment', function (User $user, Comment $comment) {
-            return $user->id === $comment->user_id;
+            // Comment author, moderator, or admin can delete
+            return $user->id === $comment->user_id || 
+                   $user->hasRole('moderator') || 
+                   $user->hasRole('admin');
+        });
+        
+        Gate::define('approve-comment', function (User $user) {
+            // Only moderators or admins can approve comments
+            return $user->hasRole('moderator') || $user->hasRole('admin');
         });
     }
 }

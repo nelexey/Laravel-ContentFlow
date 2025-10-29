@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Category;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,9 +19,10 @@ class ArticleFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => $this->faker->sentence(6), // Заголовок из 6 слов
-            'body' => $this->faker->paragraph(10), // Текст из 10 параграфов
-            'category_id' => \App\Models\Category::factory(), // Создаст новую категорию
+            'title' => $this->faker->sentence(6),
+            'body' => $this->faker->paragraph(10),
+            'author_id' => User::factory(),
+            'category_id' => Category::factory(),
         ];
     }
 }

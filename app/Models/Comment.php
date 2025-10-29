@@ -10,7 +10,11 @@ class Comment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['body', 'article_id', 'user_id'];
+    protected $fillable = ['body', 'article_id', 'user_id', 'is_approved'];
+
+    protected $casts = [
+        'is_approved' => 'boolean',
+    ];
 
     public function article(): BelongsTo
     {

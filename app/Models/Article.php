@@ -11,7 +11,12 @@ class Article extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'body', 'category_id'];
+    protected $fillable = ['title', 'body', 'author_id', 'category_id'];
+
+    public function author(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'author_id');
+    }
 
     public function category(): BelongsTo
     {
