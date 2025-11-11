@@ -13,9 +13,6 @@ use Illuminate\Support\Facades\Gate;
 
 class CommentController extends Controller
 {
-    /**
-     * Store a newly created comment.
-     */
     public function store(StoreCommentRequest $request, Article $article): JsonResponse
     {
         $comment = $article->comments()->create([
@@ -29,33 +26,25 @@ class CommentController extends Controller
         return response()->json(new CommentResource($comment), 201);
     }
 
-    /**
-     * Approve the specified comment.
-     */
     public function approve(Comment $comment): JsonResponse
     {
-        // Check if user can approve comments (moderator or admin)
         if (!Gate::allows('approve-comment')) {
             return response()->json(['error' => 'Forbidden'], 403);
         }
-        
+
         $comment->update(['is_approved' => true]);
-        
+
         return response()->json(new CommentResource($comment));
     }
 
-    /**
-     * Remove the specified comment.
-     */
     public function destroy(Comment $comment): JsonResponse
     {
-        // Check if user can delete comment (author, moderator, or admin)
         if (!Gate::allows('delete-comment', $comment)) {
             return response()->json(['error' => 'Forbidden'], 403);
         }
-        
+
         $comment->delete();
-        
+
         return response()->json(null, 204);
     }
 }

@@ -1,71 +1,78 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Создать новую статью') }}
-        </h2>
-    </x-slot>
-
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+                <div class="p-8">
+                    <div class="mb-6">
+                        <a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-800">
+                            ← Назад к статьям
+                        </a>
+                    </div>
 
-                    <form action="{{ route('articles.store') }}" method="POST">
-                        @csrf <div class="mb-3">
-                            <label for="title" class="form-label">Заголовок</label>
-                            <input type="text" 
-                                class="form-control @error('title') is-invalid @enderror" 
-                                id="title" 
-                                name="title" 
-                                value="{{ old('title') }}">
-                            
+                    <h1 class="text-3xl font-bold text-gray-900 mb-8">Создать новую статью</h1>
+
+                    <form action="{{ route('articles.store') }}" method="POST" class="space-y-6">
+                        @csrf
+
+                        <div>
+                            <label for="title" class="block text-sm font-bold text-gray-700 mb-2">
+                                Заголовок статьи
+                            </label>
+                            <input
+                                type="text"
+                                id="title"
+                                name="title"
+                                value="{{ old('title') }}"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('title') border-red-500 @enderror"
+                                placeholder="Введите заголовок статьи">
                             @error('title')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label for="category_id" class="form-label">Категория</label>
-                            <select class="form-select @error('category_id') is-invalid @enderror" 
-                                id="category_id" 
-                                name="category_id">
+                        <div>
+                            <label for="category_id" class="block text-sm font-bold text-gray-700 mb-2">
+                                Категория
+                            </label>
+                            <select
+                                id="category_id"
+                                name="category_id"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('category_id') border-red-500 @enderror">
                                 <option value="">Выберите категорию</option>
                                 @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" 
-                                        {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
                                         {{ $category->name }}
                                     </option>
                                 @endforeach
                             </select>
-
                             @error('category_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label for="body" class="form-label">Текст статьи</label>
-                            <textarea class="form-control @error('body') is-invalid @enderror" 
-                                id="body" 
-                                name="body" 
-                                rows="10">{{ old('body') }}</textarea>
-
+                        <div>
+                            <label for="body" class="block text-sm font-bold text-gray-700 mb-2">
+                                Содержание статьи
+                            </label>
+                            <textarea
+                                id="body"
+                                name="body"
+                                rows="15"
+                                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('body') border-red-500 @enderror"
+                                placeholder="Напишите текст вашей статьи...">{{ old('body') }}</textarea>
                             @error('body')
-                                <div class="invalid-feedback">{{ $message }}</div>
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <button type="submit" class="btn btn-primary">Создать</button>
-                        <a href="{{ route('home') }}" class="btn btn-secondary">Отмена</a>
+                        <div class="flex gap-3 pt-4">
+                            <button type="submit" class="inline-flex items-center px-6 py-3 bg-gray-800 border border-transparent rounded-md font-semibold text-sm text-white uppercase tracking-widest hover:bg-gray-700">
+                                ✅ Опубликовать статью
+                            </button>
+                            <a href="{{ route('home') }}" class="inline-flex items-center px-6 py-3 bg-white border border-gray-300 rounded-md font-semibold text-sm text-gray-700 uppercase tracking-widest hover:bg-gray-50">
+                                ❌ Отмена
+                            </a>
+                        </div>
                     </form>
                 </div>
             </div>

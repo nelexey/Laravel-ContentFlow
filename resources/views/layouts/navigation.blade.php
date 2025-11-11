@@ -5,19 +5,28 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                    <a href="{{ route('home') }}" class="text-xl font-bold text-gray-800">
+                        ContentFlow
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                    <x-nav-link :href="route('home')" :active="request()->routeIs('home') || request()->routeIs('articles.*')">
+                        Статьи
                     </x-nav-link>
-                    <x-nav-link :href="route('admin.comments.index')" :active="request()->routeIs('admin.comments.index')">
-                        {{ __('Модерация') }}
-                    </x-nav-link>
+                    @auth
+                        @can('create', App\Models\Article::class)
+                            <x-nav-link :href="route('articles.create')" :active="request()->routeIs('articles.create')">
+                                Создать статью
+                            </x-nav-link>
+                        @endcan
+                        @can('approve-comment')
+                            <x-nav-link :href="route('admin.comments.index')" :active="request()->routeIs('admin.comments.index')">
+                                Модерация
+                            </x-nav-link>
+                        @endcan
+                    @endauth
                 </div>
             </div>
 
@@ -79,9 +88,21 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+            <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home') || request()->routeIs('articles.*')">
+                Статьи
             </x-responsive-nav-link>
+            @auth
+                @can('create', App\Models\Article::class)
+                    <x-responsive-nav-link :href="route('articles.create')" :active="request()->routeIs('articles.create')">
+                        Создать статью
+                    </x-responsive-nav-link>
+                @endcan
+                @can('approve-comment')
+                    <x-responsive-nav-link :href="route('admin.comments.index')" :active="request()->routeIs('admin.comments.index')">
+                        Модерация
+                    </x-responsive-nav-link>
+                @endcan
+            @endauth
         </div>
 
         <!-- Responsive Settings Options -->

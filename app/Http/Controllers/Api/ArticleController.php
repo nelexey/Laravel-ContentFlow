@@ -13,9 +13,6 @@ use Illuminate\Http\JsonResponse;
 
 class ArticleController extends Controller
 {
-    /**
-     * Display a listing of articles.
-     */
     public function index(): JsonResponse
     {
         $articles = Article::with('author')
@@ -33,9 +30,6 @@ class ArticleController extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created article.
-     */
     public function store(StoreArticleRequest $request): JsonResponse
     {
         $category = Category::firstOrCreate(['name' => 'General']);
@@ -52,26 +46,19 @@ class ArticleController extends Controller
         return response()->json(new ArticleResource($article), 201);
     }
 
-    /**
-     * Display the specified article.
-     */
     public function show(Article $article): JsonResponse
     {
         $article->load(['author', 'comments' => function ($query) {
             $query->where('is_approved', true)->with('user');
         }]);
-        
+
         return response()->json(new ArticleResource($article));
     }
 
-    /**
-     * Update the specified article.
-     */
     public function update(UpdateArticleRequest $request, Article $article): JsonResponse
     {
         $this->authorize('update', $article);
-        
-        // Prepare data for update
+
         $data = [];
         if ($request->has('title')) {
             $data['title'] = $request->title;
@@ -82,15 +69,12 @@ class ArticleController extends Controller
         if ($request->has('category_id')) {
             $data['category_id'] = $request->category_id;
         }
-        
+
         $article->update($data);
-        
+
         return response()->json(new ArticleResource($article));
     }
 
-    /**
-     * Remove the specified article.
-     */
     public function destroy(Article $article): JsonResponse
     {
         $this->authorize('delete', $article);

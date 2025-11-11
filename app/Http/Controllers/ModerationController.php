@@ -4,14 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Cache;
 
-class ModerationController extends BaseController
+class ModerationController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('can:create,App\Models\Article');
+        $this->middleware('can:approve-comment');
     }
 
     public function index()
@@ -19,7 +18,7 @@ class ModerationController extends BaseController
         $pendingComments = Comment::where('is_approved', false)
             ->with('user', 'article')
             ->latest()
-            ->get();
+            ->paginate(10);
 
         return view('admin.comments.index', compact('pendingComments'));
     }

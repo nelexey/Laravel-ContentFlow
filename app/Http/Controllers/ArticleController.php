@@ -6,11 +6,10 @@ use App\Events\ArticleCreated;
 use App\Models\Article;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
-class ArticleController extends BaseController
+class ArticleController extends Controller
 {
     public function index()
     {
@@ -43,7 +42,10 @@ class ArticleController extends BaseController
         $validated['author_id'] = auth()->id();
         $article = Article::create($validated);
 
-        Cache::tags(['articles'])->flush();
+        // Clear cache without using tags (compatible with all cache drivers)
+        Cache::forget('articles.index.page.1');
+        // You might want to clear other cached pages as well
+        // For now, we'll just clear the first page which is most commonly accessed
 
         ArticleCreated::dispatch($article->load('author'));
 
@@ -91,7 +93,8 @@ class ArticleController extends BaseController
         ]);
         $article->update($validated);
 
-        Cache::tags(['articles'])->flush();
+        // Clear cache without using tags
+        Cache::forget('articles.index.page.1');
         Cache::forget("article.{$article->id}.with.comments");
 
         return redirect()->route('articles.show', $article)->with('success', 'Статья отредактирована');
@@ -103,7 +106,8 @@ class ArticleController extends BaseController
         $articleId = $article->id;
         $article->delete();
 
-        Cache::tags(['articles'])->flush();
+        // Clear cache without using tags
+        Cache::forget('articles.index.page.1');
         Cache::forget("article.{$articleId}.with.comments");
 
         return redirect()->route('home')->with('success', 'Статья удалена');

@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [ArticleController::class, 'index'])->name('home');
 
-
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -23,18 +22,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile/tokens/{tokenId}', [ProfileController::class, 'deleteToken'])->name('profile.tokens.delete');
 });
 
-
-Route::resource('articles', ArticleController::class)->only([
-    'index', 
-    'show'   
-]);
-
-
-Route::resource('articles', ArticleController::class)->except([
-    'index', 
-    'show'   
-])->middleware(['auth', 'verified']);
-
+// Explicitly define article routes to ensure correct order
+Route::get('/articles', [ArticleController::class, 'index'])->name('articles.index');
+Route::get('/articles/create', [ArticleController::class, 'create'])->name('articles.create')->middleware(['auth', 'verified']);
+Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store')->middleware(['auth', 'verified']);
+Route::get('/articles/{article}', [ArticleController::class, 'show'])->name('articles.show');
+Route::get('/articles/{article}/edit', [ArticleController::class, 'edit'])->name('articles.edit')->middleware(['auth', 'verified']);
+Route::put('/articles/{article}', [ArticleController::class, 'update'])->name('articles.update')->middleware(['auth', 'verified']);
+Route::delete('/articles/{article}', [ArticleController::class, 'destroy'])->name('articles.destroy')->middleware(['auth', 'verified']);
 
 Route::post('articles/{article}/comments', [CommentController::class, 'store'])
         ->name('comments.store')
