@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\CommentCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Resources\CommentResource;
@@ -20,9 +21,11 @@ class CommentController extends Controller
         $comment = $article->comments()->create([
             'body' => $request->body,
             'user_id' => $request->user()->id,
-            'is_approved' => false, // Default to not approved
+            'is_approved' => false,
         ]);
-        
+
+        CommentCreated::dispatch($comment->load(['article', 'user']));
+
         return response()->json(new CommentResource($comment), 201);
     }
 

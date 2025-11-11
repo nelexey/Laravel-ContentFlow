@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\ArticleCreated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreArticleRequest;
 use App\Http\Requests\UpdateArticleRequest;
@@ -37,16 +38,17 @@ class ArticleController extends Controller
      */
     public function store(StoreArticleRequest $request): JsonResponse
     {
-        // Get or create a default category
         $category = Category::firstOrCreate(['name' => 'General']);
-        
+
         $article = Article::create([
             'title' => $request->title,
             'body' => $request->content,
             'author_id' => $request->user()->id,
             'category_id' => $category->id,
         ]);
-        
+
+        ArticleCreated::dispatch($article->load('author'));
+
         return response()->json(new ArticleResource($article), 201);
     }
 

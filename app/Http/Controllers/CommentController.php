@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CommentCreated;
 use App\Mail\NewCommentNotification;
 use App\Models\Article;
 use App\Models\Role;
@@ -26,11 +27,12 @@ class CommentController extends Controller
             'is_approved' => false,
         ]);
 
-        // Send email notification to moderators
         $moderators = Role::where('name', 'moderator')->first()->users ?? collect();
         foreach ($moderators as $moderator) {
             Mail::to($moderator->email)->send(new NewCommentNotification($comment));
         }
+
+        CommentCreated::dispatch($comment->load(['article', 'user']));
 
         return redirect()
             ->route('articles.show', $article)

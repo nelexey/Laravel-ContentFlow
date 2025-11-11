@@ -1,7 +1,12 @@
 import './bootstrap';
+import { initNotifications } from './notifications';
 
 import Alpine from 'alpinejs';
 
 window.Alpine = Alpine;
 
 Alpine.start();
+
+document.addEventListener('DOMContentLoaded', () => {
+    initNotifications();
+});

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ArticleCreated;
 use App\Models\Article;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -30,7 +31,12 @@ class ArticleController extends BaseController
             'body'        => 'required|string|min:20',
             'category_id' => 'required|exists:categories,id',
         ]);
-        Article::create($validated);
+
+        $validated['author_id'] = auth()->id();
+        $article = Article::create($validated);
+
+        ArticleCreated::dispatch($article->load('author'));
+
         return redirect()->route('home')->with('success', 'Статься опубликована');
     }
 

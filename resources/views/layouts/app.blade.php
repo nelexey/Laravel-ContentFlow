@@ -18,6 +18,9 @@
         <div class="min-h-screen bg-gray-100">
             @include('layouts.navigation')
 
+            <div id="notification-container" class="fixed top-20 right-4 z-50 pointer-events-none">
+            </div>
+
             <!-- Page Heading -->
             @isset($header)
                 <header class="bg-white shadow">
