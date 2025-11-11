@@ -7,12 +7,20 @@ use App\Models\Article;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class ArticleController extends BaseController
 {
     public function index()
     {
-        $articles = Article::with('category')->latest()->paginate(10);
+        $page = request('page', 1);
+        $cacheKey = "articles.index.page.{$page}";
+
+        $articles = Cache::remember($cacheKey, 3600, function () {
+            return Article::with('category')->latest()->paginate(10);
+        });
+
         return view('articles.index', compact('articles'));
     }
 
@@ -35,6 +43,8 @@ class ArticleController extends BaseController
         $validated['author_id'] = auth()->id();
         $article = Article::create($validated);
 
+        Cache::tags(['articles'])->flush();
+
         ArticleCreated::dispatch($article->load('author'));
 
         return redirect()->route('home')->with('success', 'Статься опубликована');
@@ -42,13 +52,25 @@ class ArticleController extends BaseController
 
     public function show(Article $article)
     {
-        $article->load([
-            'category',
-            'comments' => function ($query) {
-                $query->where('is_approved', true)->latest();
-            },
-            'comments.user',
+        $cacheKey = "article.{$article->id}.with.comments";
+
+        $article = Cache::remember($cacheKey, 1800, function () use ($article) {
+            $article->load([
+                'category',
+                'comments' => function ($query) {
+                    $query->where('is_approved', true)->latest();
+                },
+                'comments.user',
+            ]);
+            return $article;
+        });
+
+        DB::table('article_views')->insert([
+            'article_id' => $article->id,
+            'ip_address' => request()->ip(),
+            'viewed_at' => now(),
         ]);
+
         return view('articles.show', compact('article'));
     }
 
@@ -68,13 +90,22 @@ class ArticleController extends BaseController
             'category_id' => 'required|exists:categories,id',
         ]);
         $article->update($validated);
+
+        Cache::tags(['articles'])->flush();
+        Cache::forget("article.{$article->id}.with.comments");
+
         return redirect()->route('articles.show', $article)->with('success', 'Статья отредактирована');
     }
 
     public function destroy(Article $article)
     {
         $this->authorize('delete', $article);
+        $articleId = $article->id;
         $article->delete();
+
+        Cache::tags(['articles'])->flush();
+        Cache::forget("article.{$articleId}.with.comments");
+
         return redirect()->route('home')->with('success', 'Статья удалена');
     }
 }

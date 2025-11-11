@@ -8,6 +8,7 @@ use App\Models\Article;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 
@@ -31,6 +32,8 @@ class CommentController extends Controller
         foreach ($moderators as $moderator) {
             Mail::to($moderator->email)->send(new NewCommentNotification($comment));
         }
+
+        Cache::forget("article.{$article->id}.with.comments");
 
         CommentCreated::dispatch($comment->load(['article', 'user']));
 
