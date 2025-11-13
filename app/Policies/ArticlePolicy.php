@@ -28,8 +28,9 @@ class ArticlePolicy
      */
     public function create(User $user): bool
     {
-        // Any authenticated user can create articles
-        return true;
+        // Users with 'reader' role cannot create articles
+        // Only users without the 'reader' role can create articles
+        return !$user->hasRole('reader');
     }
 
     /**
