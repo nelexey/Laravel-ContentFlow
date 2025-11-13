@@ -15,6 +15,12 @@
                     <x-nav-link :href="route('home')" :active="request()->routeIs('home') || request()->routeIs('articles.*')">
                         Статьи
                     </x-nav-link>
+                    <x-nav-link :href="route('about')" :active="request()->routeIs('about')">
+                        О нас
+                    </x-nav-link>
+                    <x-nav-link :href="route('contacts')" :active="request()->routeIs('contacts')">
+                        Контакты
+                    </x-nav-link>
                     @auth
                         @can('create', App\Models\Article::class)
                             <x-nav-link :href="route('articles.create')" :active="request()->routeIs('articles.create')">
@@ -90,6 +96,12 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home') || request()->routeIs('articles.*')">
                 Статьи
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('about')" :active="request()->routeIs('about')">
+                О нас
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('contacts')" :active="request()->routeIs('contacts')">
+                Контакты
             </x-responsive-nav-link>
             @auth
                 @can('create', App\Models\Article::class)
